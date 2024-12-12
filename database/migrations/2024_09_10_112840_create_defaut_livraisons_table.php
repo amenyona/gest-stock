@@ -14,11 +14,14 @@ return new class extends Migration
         Schema::create('defaut_livraisons', function (Blueprint $table) {
             $table->id();
             $table->unsignedBigInteger('user_id');
+            $table->unsignedBigInteger('commandeFournissuer_id');
+            $table->unsignedBigInteger('produit_id');
             $table->uuid('uuid');
             $table->string('typeDefaut');
             $table->string('description');
             $table->string('dateSignalement');
             $table->string('dateResolution')->nullable();
+            $table->string('livraisonsortieouentree')->nullable();
             $table->boolean('worked')->default(false);
             $table->timestamps();
         });

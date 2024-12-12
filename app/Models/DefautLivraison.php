@@ -14,6 +14,8 @@ class DefautLivraison extends Model
     use HasFactory;
     protected $fillable = [
         'user_id',
+        'commandeFournissuer_id',
+        'produit_id',
         'uuid',
         'typeDefaut',
         'description',
@@ -28,5 +30,9 @@ class DefautLivraison extends Model
 
      public function user(){
         return $this->belongsTo(User::class, 'user_id');
+     }
+
+     public function produit(){
+        return $this->belongsTo(Produit::class, 'produit_id');
      }
 }

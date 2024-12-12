@@ -16,7 +16,10 @@ return new class extends Migration
             $table->unsignedBigInteger('user_id');
             $table->uuid('uuid');
             $table->decimal('montantTotal',12,5);
+            $table->string('montantDefinitifPaye');
             $table->string('natureReglement');
+            $table->string('remise')->nullable();
+            $table->string('montantLivraison')->nullable();
             $table->string('preuve');
             $table->boolean('worked')->default(false);
             $table->timestamps();

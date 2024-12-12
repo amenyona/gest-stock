@@ -64,11 +64,16 @@
         </ul>
     </li>
     <li>
-        <a href="{{route('fournisseur.indexCommande')}}" class="waves-effect">
-            <i class="bx bx-chat"></i>
-            <span key="t-chat">Commandes au fournisseur</span>
+        <a href="javascript: void(0);" class="has-arrow waves-effect">
+            <i class="bx bx-tone"></i>
+            <span key="t-ui-elements">Commandes Fournisseurs</span>
         </a>
+        <ul class="sub-menu" aria-expanded="false">
+            <li><a href="{{route('fournisseur.indexCommandesFournisseur')}}" key="t-alerts">Consulter commandes</a></li>
+            <li><a href="{{route('fournisseur.indexCommande')}}" key="t-buttons">Créer commandes</a></li>
+        </ul>
     </li>
+    
 
     <li>
         <a href="{{route('fournisseur.rechercherLesommandes')}}" class="waves-effect">
@@ -76,7 +81,7 @@
             <span key="t-chat">Traiter les commandes</span>
         </a>
     </li>
-    <li>
+    <!--<li>
         <a href="{{route('medecin.liste')}}" class="waves-effect">
             <i class="bx bx-chat"></i>
             <span key="t-chat">Liste des médecins</span>
@@ -86,6 +91,12 @@
         <a href="{{route('patient.liste')}}" class="waves-effect">
             <i class="bx bx-chat"></i>
             <span key="t-chat">Liste des patients</span>
+        </a>
+    </li>-->
+    <li>
+        <a href="{{route('client.liste')}}" class="waves-effect">
+            <i class="bx bx-chat"></i>
+            <span key="t-chat">Liste des clients</span>
         </a>
     </li>
     @endif

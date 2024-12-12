@@ -6,21 +6,27 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <title>Ma Page avec Table</title>
     <link rel="stylesheet" href="styles.css"> <!-- Lien vers une feuille de styles CSS -->
+    <style>
+        .idshowimg{
+                   height: 70px;
+                   width: 70px;
+               }
+    </style>
 </head>
 <body>
 
-    <header>
-        <h1>Bienvenue sur la page  produits dont les commandes sont en cours chez {{retreiveFournisseur(session()->get('keyf'))}}</h1> <br>
-        Nous avons au total {{countCommande(session()->get('keye'),session()->get('keyf'))}} commandes en cours de livraison
+    <header style="text-align: center">
+        <img class="idshowimg" src="assets/images/logo/donbosco.png" alt="" height="19">           
+        <p> CENTRE DE FORMATION PROFESSIONNELLE DON BOSCO</p>
+                <p> BP 5350, Ouagadougou</p>
+                <p>TEL: +226 60 02 18 18</p>
+                <h4>Commandes en cours de livraison chez {{retreiveFournisseur(session()->get('keyf'))}}</h4> 
+                Nous avons au total {{countCommande(session()->get('keye'),session()->get('keyf'))}} commandes en cours de livraison
+                
     </header>
-
-
-
     <main>
-
-
         <section id="section2">
-            <h2>Table des Données</h2>
+            <p><h2>Produits en cours de livraison au numéro de commande : {{session()->get('keynumerocommande')}}</h2></p>
             <table border="1" cellspacing="0" cellpadding="10">
                 <thead>
                     <tr>
@@ -31,13 +37,10 @@
                 </thead>
                 <tbody>
                 @foreach ($commandes as $item)
-                    <tr>
-                    
+                    <tr>                   
                         <td>{{$item->produitnom}}</td>
                         <td>{{$item->quantitefourniprod}}</td>
-                        <td>{{$item->datefourniprod}}</td>
-                        
-                        
+                        <td>{{$item->datefourniprod}}</td>                                                
                     </tr>
                     @endForeach
  

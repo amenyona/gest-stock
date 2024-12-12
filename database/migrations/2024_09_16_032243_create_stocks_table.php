@@ -13,7 +13,8 @@ return new class extends Migration
     {
         Schema::create('stocks', function (Blueprint $table) {
             $table->id();
-            $table->integer('produit_id');
+            $table->integer('user_id')->unsigned();
+            $table->integer('produit_id')->unsigned();
             $table->integer('quantité');
             $table->integer('quantiteSeuil')->nullable();
             $table->integer('quantiteAlert')->nullable();

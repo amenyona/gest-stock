@@ -27,7 +27,7 @@
                 <div class="col-sm-6">
                     <div class="mb-3">
                         <label class="control-label">Fournisseurs</label>
-                                <select class="form-control select2" name="fournisseur" required> 
+                                <select class="form-control select2 fournisseurId" name="fournisseur" required> 
                                     <option>Veuillez Selectionner</option>
                                     @foreach ($fournisseurs as $item)
                                     <option value="{{$item->id}}">{{$item->raisonSocial}}</option>
@@ -43,13 +43,19 @@
                 <div class="col-sm-6">
                     <div class="mb-3">
                         <label for="adresse">Etat de commande</label>
-                        <select class="form-control select2" name="etat" required> 
-                            <option>Veuillez Selectionner</option>
+                        <select class="form-control select2 etat" name="etat" required> 
+                            <option value="Veuillez Sélectionner">Veuillez Sélectionner</option>
                             
                             <option value="en_cours">Commande en cours</option>
                             <option value="livré">Commande livrée</option>
                             <option value="annulé">Commande annulée</option>
                                                            
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label for="adresse">Numéro Commande commande</label>
+                        <select class="form-control select2 numerocomande" id="numerocomande" name="numerocomande" dependente="numero commande" required> 
+                            <option value="Veuillez Sélectionner">Veuillez Sélectionner</option>                                                                                    
                         </select>
                     </div>
                                       

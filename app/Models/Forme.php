@@ -11,6 +11,7 @@ class Forme extends Model
 
     protected $fillable = [
         'user_id',
+        'famille_id',
         'uuid',
         'nom',
         'description',
@@ -19,6 +20,9 @@ class Forme extends Model
 
     public function user(){
         return $this->belongsTo('App\Models\User','user_id','id');
+    }
+    public function famille(){
+        return $this->belongsTo('App\Models\Famille','famille_id','id');
     }
 
     public function produits(){

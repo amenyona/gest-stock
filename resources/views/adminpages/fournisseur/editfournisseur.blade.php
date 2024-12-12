@@ -22,7 +22,7 @@
         <div class="card">
             <div class="card-body">
 
-                <form action="{{ route('produit.update',$produit->uuid) }}" method="POST">
+                <form action="{{ route('fournisseur.update',$fournisseur['uuid']) }}" method="POST">
                     @csrf
                     @method('PUT')
                     <div class="results">
@@ -46,89 +46,57 @@
                     </div>
                     <div class="row">
                         <div class="mt-4">
-                            <a href="{{route('produit.index')}}" class="btn btn-primary waves-effect waves-light btn-sm">Aller &agrave; la liste <i class="mdi mdi-arrow-left ms-1"></i></a>
+                            <a href="{{route('fournisseur.index')}}" class="btn btn-primary waves-effect waves-light btn-sm">Aller &agrave; la liste <i class="mdi mdi-arrow-left ms-1"></i></a>
                         </div>
                         <br>
                         <div class="col-sm-6">
                             <div class="mb-3">
-                                <label for="nom">Nom</label>
-                                <input type="text" class="form-control"  name="nom" placeholder="Entrer le nom" value="{{$produit->nom}}">
-                                   <span class="text-danger">@error('nom'){{ $message }}
+                                <label for="nom">Raison Sociale</label>
+                                <input type="text" class="form-control"  name="raisonSocial" placeholder="Entrer le nom" value="{{$fournisseur['raisonSocial']}}">
+                                   <span class="text-danger">@error('raisonSocial'){{ $message }}
                                      @enderror
                                   </span>
                             </div>
                             <div class="mb-3">
-                                <label for="description">Description</label>
-                                <input type="text" class="form-control"  name="description" placeholder="Entrer la description" value="{{$produit->description}}">
-                                   <span class="text-danger">@error('description'){{ $message }}
+                                <label for="adresse">Adresse</label>
+                                <input type="text" class="form-control"  name="adresse" placeholder="Entrer l'adresse" value="{{$fournisseur['adresse']}}">
+                                   <span class="text-danger">@error('adresse'){{ $message }}
                                      @enderror
                                   </span>
                             </div>
-                            <div class="mb-3">
-                                <label for="prix">Prix</label>
-                                <input type="prix" class="form-control"  name="prix" placeholder="Entrer prix" value="{{$produit->prix}}">
-                                <span class="text-danger">@error('prix'){{ $message }}
-                                   @enderror
-                                </span>
-                            </div>
-                           <div class="mb-3">
-                                <label for="quantiteStock">Quantite en Stock</label>
-                                <input id="quantiteStock" name="quantiteStock" type="text" class="form-control" placeholder="Entrer quantite en stock" value="{{$produit->quantiteStock}}">
-                                <span class="text-danger">@error('quantiteStock'){{ $message }}
-                                    @enderror
-                                 </span>
-                            </div>
-                                                    
+                            
+                            
                         </div>
-
+                        
                         <div class="col-sm-6">
-
-                            <div class="mb-3" id="datepicker1">
-                                <label for="dateExpiration">Date Expiration</label>
-                                <input id="dateExpiration" name="dateExpiration" type="text" class="form-control" placeholder="dd M, yyyy"
-                                data-date-format="dd M, yyyy" data-date-container='#datepicker1' data-provide="datepicker" value="{{$produit->dateExpiration}}">
-                                <span class="text-danger">@error('dateExpiration'){{ $message }}
-                                    @enderror
-                                 </span>
-                            </div>
+                            
+                            <div class="mb-3">
+                                 <label for="telephone">Telephone</label>
+                                 <input id="telephone" name="telephone" type="text" class="form-control" placeholder="Entrer telephone" value="{{$fournisseur['telephone']}}">
+                                 <span class="text-danger">@error('telephone'){{ $message }}
+                                     @enderror
+                                  </span>
+                             </div>
+                            
 
                             <div class="mb-3">
-                                <label for="quantiteSeuil">Quantité Seuil</label>
-                                <input id="quantiteSeuil" name="quantiteSeuil" type="text" class="form-control" placeholder="Entrer la quantité Seuil" value="{{$produit->quantiteSeuil}}">
-                                <span class="text-danger">@error('quantiteSeuil'){{ $message }}
+                                <label for="email">Email</label>
+                                <input id="email" name="email" type="text" class="form-control" placeholder="Entrer email" value="{{$fournisseur['email']}}">
+                                <span class="text-danger">@error('email'){{ $message }}
                                     @enderror
                                  </span>
                             </div>
                             
-                            <div class="mb-3">
-                                <label class="control-label">Familles</label>
-                                <select class="form-control select2" name="famille"> 
-                                    <option>Veuillez Selectionner</option>
-                                    @foreach ($familles as $item)
-                                    <option value="{{$item->id}}" <?= $famId == $item->id ? ' selected="selected"' : '';?>>{{$item->nom}}</option>
-                                    @endforeach
-                                    
-                                </select>
-                            </div>
-
-                            <div class="mb-3">
-                                <label class="control-label">Formes</label>
-                                <select class="form-control select2" name="forme"> 
-                                    <option>Veuillez Selectionner</option>
-                                    @foreach ($formes as $item)
-                                    <option value="{{$item->id}}" <?= $formId == $item->id ? ' selected="selected"' : '';?>>{{$item->nom}}</option>
-                                    @endforeach
-                                    
-                                </select>
-                            </div>
-                            <input type="hidden" name="id" value="{{$produit->id}}">
+                            
+                   
+                            <input type="hidden" name="fournissuerId" value="{{$fournisseur['id']}}">
    
                         </div>
                     </div>
                     
                     
-                    <div class="d-flex flex-wrap gap-2">
-                        <button type="submit" class="btn btn-success waves-effect waves-light">Modifier</button>
+                    <div class="d-flex flex-wrap gap-6">
+                        <button type="submit" class="btn btn-primary waves-effect waves-light">Modifier</button>
                         
                     </div>
                     

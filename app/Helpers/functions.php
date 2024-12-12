@@ -4,6 +4,8 @@ use Illuminate\Support\Facades\Auth;
 use App\Models\User;
 use App\Models\Produit;
 use App\Models\Fournisseur;
+use App\Models\Famille;
+use App\Models\Forme;
 use Illuminate\Support\Str;
 
 
@@ -83,6 +85,36 @@ function renvoiProduitfs($arg1,$arg2){
     }
     return $produits; 
 }
+function renvoiProduitffs($arg1,$arg2,$arg3){
+    $idEntreprise = User::find(Auth::user()->id)->first();
+    //$produits = Produit::where('worked','=',1)->get();
+    $produits = DB::table('fournisseur_produit')
+            ->join('fournisseurs','fournisseur_produit.fournisseur_id','=','fournisseurs.id')
+            ->join('produits','fournisseur_produit.produit_id','=','produits.id')
+            ->where('fournisseur_produit.commandé','=',$arg1)
+            ->where('produits.worked','=',1)
+            ->where('fournisseur_produit.fournisseur_id','=',$arg2)
+            ->where('fournisseur_produit.numeroCommande','=',$arg3)
+            ->select('fournisseur_produit.user_id as idfourniproduserId',
+                     'fournisseur_produit.fournisseur_id as idfourniprodfourniId',
+                     'fournisseur_produit.produit_id as idfourniprodproId',
+                     'fournisseur_produit.uuid as uuidfourniprod',
+                     'fournisseur_produit.dateCommande as datefourniprod',
+                     'fournisseur_produit.quantiteCommande as quantitefourniprod',
+                     'fournisseur_produit.created_at as created_at',
+                     'fournisseur_produit.updated_at as updated_at',
+                     'produits.nom as produitnom',
+                     'produits.id as produitid',
+                     'fournisseurs.raisonSocial as raisonSocial'
+                      )->orderBy('created_at','DESC')
+                      ->get();
+    //dd($produits);
+    $output = '<option value="Veuillez Sélectionner">'."Veuillez S&eacute;lectionner".'</option>';
+    foreach($produits as $row){
+        $output .= '<option value="'.$row->produitid.'">'.$row->produitnom.'</option>';
+    }
+    return $produits; 
+}
 function renvoiProduits(){
     $user = User::find(Auth::user()->id)->first();
   $produits = Produit::where('worked','=',1)->get();
@@ -114,12 +146,23 @@ $produit = Produit::find($produitId);
 return $produit->prix;
 }
 
-function retreiveInfoFournisseurProduit($arg1, $arg2){
+function retreiveFormeNom($formeId){
+$forme = Forme::find($formeId);
+return $forme->nom;
+}
+
+function retreiveFamilleNom($familleId){
+$famille = Famille::find($familleId);
+return $famille->nom;
+}
+
+function retreiveInfoFournisseurProduit($arg1, $arg2,$arg3){
     $commandes = DB::table('fournisseur_produit')
             ->join('fournisseurs','fournisseur_produit.fournisseur_id','=','fournisseurs.id')
             ->join('produits','fournisseur_produit.produit_id','=','produits.id')
             ->where('fournisseur_produit.commandé','=',$arg1)
             ->where('fournisseur_produit.fournisseur_id','=',$arg2)
+            ->where('fournisseur_produit.numeroCommande','=',$arg3)
             ->select('fournisseur_produit.user_id as idfourniproduserId',
                      'fournisseur_produit.fournisseur_id as idfourniprodfourniId',
                      'fournisseur_produit.produit_id as idfourniprodproId',
@@ -156,6 +199,27 @@ function countCommande($arg1,$arg2){
         return $commandes;
 
 }
+function countCommandef($arg1,$arg2,$arg3){
+    $commandes = DB::table('fournisseur_produit')
+            ->join('fournisseurs','fournisseur_produit.fournisseur_id','=','fournisseurs.id')
+            ->join('produits','fournisseur_produit.produit_id','=','produits.id')
+            ->where('fournisseur_produit.commandé','=',$arg1)
+            ->where('fournisseur_produit.fournisseur_id','=',$arg2)
+            ->where('fournisseur_produit.numeroCommande','=',$arg3)
+            ->select('fournisseur_produit.user_id as idfourniproduserId',
+                     'fournisseur_produit.fournisseur_id as idfourniprodfourniId',
+                     'fournisseur_produit.produit_id as idfourniprodproId',
+                     'fournisseur_produit.uuid as uuidfourniprod',
+                     'fournisseur_produit.dateCommande as datefourniprod',
+                     'fournisseur_produit.quantiteCommande as quantitefourniprod',
+                     'fournisseur_produit.created_at as created_at',
+                     'fournisseur_produit.updated_at as updated_at',
+                     'produits.nom as produitnom',
+                     'fournisseurs.raisonSocial as raisonSocial'
+                      )->get()->count();
+        return $commandes;
+
+}
 
 function retreiveInfo($arg){
     $commande = DB::table('fournisseur_produit')
@@ -177,6 +241,32 @@ function retreiveInfo($arg){
 return $commande;
 }
 
+
+function retreiveQuantiteCommandeFournisseurProduit($arg1, $arg2,$arg3){
+    $commandes = DB::table('fournisseur_produit')
+               ->where([
+                ['fournisseur_produit.produit_id','=',$arg1],
+                ['fournisseur_produit.fournisseur_id','=',$arg2],
+                ['fournisseur_produit.numeroCommande','=',$arg3],
+               ])->first();
+    //dd($commandes);        
+    return $commandes->quantiteCommande;
+}
+
+function retreiveQuantiteLivraisonFournisseurProduit($arg1, $arg2,$arg3){
+    $commandes = DB::table('fournisseur_produit')
+               ->where([
+                ['fournisseur_produit.produit_id','=',$arg1],
+                ['fournisseur_produit.fournisseur_id','=',$arg2],
+                ['fournisseur_produit.numeroCommande','=',$arg3],
+               ])->first();
+    //dd($commandes);      
+    if($commandes->quantiteLivraison > 0 && $commandes->commandé == "en_cours"){
+        return true;
+    }else{
+        return false;
+    }  
+}
 
 
 

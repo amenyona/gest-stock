@@ -19,10 +19,10 @@ return new class extends Migration
             $table->unsignedBigInteger('famille_id');
             $table->string('nom');
             $table->string('description');
-            $table->decimal('prix',12,5);
+            $table->decimal('prix',12,5)->nullable();;
             $table->string('quantiteStock')->nullable();
-            $table->string('dateExpiration');
-            $table->string('quantiteSeuil');
+            $table->string('dateExpiration')->nullable();;
+            $table->string('quantiteSeuil')->nullable();;
             $table->string('image')->nullable();
             $table->boolean('worked')->default(false);
             $table->timestamps();

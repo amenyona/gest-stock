@@ -17,7 +17,7 @@ return new class extends Migration
             $table->unsignedBigInteger('user_id');
             $table->unsignedBigInteger('vente_id');
             $table->unsignedBigInteger('produit_id');
-            $table->integer('ordonnaceId')->nullable();
+            $table->integer('commandeClient_id')->nullable();
             $table->integer('quantité_vendue');
             $table->decimal('prix_unitaire', 12,5);
             $table->boolean('worked')->default(false);

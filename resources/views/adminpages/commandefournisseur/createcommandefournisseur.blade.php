@@ -56,7 +56,7 @@
                                 <tr>
                                     <th>Produit</th>
                                     <th>Quantité Commande</th>
-                                    <th>Date Expert Commande</th>
+                                    <th>Date Expert Livraison</th>
                                     <th><button type="button" name="add" class="btn btn-success btn-xs add"><i class="bx bx-plus"></i></button></th>
                                 </tr>
                             </thead>

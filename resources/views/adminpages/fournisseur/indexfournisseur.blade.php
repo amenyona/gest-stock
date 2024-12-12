@@ -76,7 +76,8 @@
                         <th>Raison Sociale</th>
                         <th>Adresse</th>
                         <th>Téléphone</th>
-                        <th>Email</th>                        
+                        <th>Email</th>
+                        <th>Actions</th>                        
                    
                     </tr>
                     </thead>
@@ -89,6 +90,17 @@
                         <td>{{$item->adresse}}</td>
                         <td>{{$item->telephone}}</td>
                         <td>{{$item->email}}</td>
+                        <td>
+                            <a href="{{route('fournisseur.edit',$item->uuid)}}" class="btn btn-success waves-light waves-effect"><i class="mdi mdi-pencil"></i></a>
+                            <form style="display: inline-block;" action="#" method="post">
+                                @csrf
+                                @method('DELETE')
+                                <a href="{{route('fournisseur.delete',$item->uuid)}}"  onclick="return confirm('Etes vous sûr de vouloir supprimer ce fournisseur ?')" class="btn btn-danger waves-light waves-effect"><i class="far fa-trash-alt"></i></a>
+                                <input name="_method" type="hidden" value="DELETE" class="far fa-trash-alt">
+                                <input type="hidden" name="_token" value="{{ csrf_token() }}">
+                                
+                          </form>
+                        </td>
                        
                     </tr>
                     @endForeach

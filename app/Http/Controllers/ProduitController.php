@@ -25,7 +25,16 @@ class ProduitController extends Controller
             ];
             
                 $user = User::where('id', '=', Auth::user()->id)->first();
-                $produits = Produit::where('worked','=',1)->latest()->paginate('10');
+                $produits = DB::table('produits')
+                ->join('familles','produits.famille_id','familles.id')
+                ->join('formes','produits.forme_id','formes.id')
+                ->where([
+                    ['produits.worked','=', 1],
+                    ['familles.worked','=',1],
+                    ['formes.worked','=',1]
+                 ])
+                ->select('produits.*')->latest()->paginate('10');
+                //dd($produits);
                 return view('adminpages.produit.indexproduit',compact('produits','user','tableau'));   
 
     }
@@ -55,12 +64,14 @@ class ProduitController extends Controller
         if ($request->famille == "Veuillez Selectionner" || $request->forme == "Veuillez Selectionner") {
             return back()->with('errorchamps', 'Echec!!!Veuillez selectionner les champs famille, ou forme');
         }
+
+        if($request->quantiteSeuil<$request->quantiteStock){
+            return back()->with('errorchamps', 'Echec!!!la quantite seuil doit être plus grande que la quantité alerte');
+        }
         $request->validate([
             'nom' => 'required|min:4|unique:produits',
             'description' => 'required|min:4',
-            'prix' => 'required|numeric',
             'quantiteStock' => 'required|numeric',
-            'dateExpiration' => 'required',
             'quantiteSeuil' => 'numeric',
             'famille' => 'required',
             'forme' => 'required',
@@ -72,9 +83,7 @@ class ProduitController extends Controller
             $produit->user_id = Auth::user()->id;
             $produit->nom = $request->nom;
             $produit->description = $request->description;
-            $produit->prix = $request->prix;
             $produit->quantiteStock = $request->quantiteStock;
-            $produit->dateExpiration = $request->dateExpiration;
             $produit->quantiteSeuil = $request->quantiteSeuil;
             $produit->famille_id = $request->famille;
             $produit->forme_id = $request->forme;
@@ -130,12 +139,14 @@ class ProduitController extends Controller
         if ($request->famille == "Veuillez Selectionner" || $request->forme == "Veuillez Selectionner") {
             return back()->with('errorchamps', 'Echec!!!Veuillez selectionner les champs famille, ou forme');
         }
+
+        if($request->quantiteSeuil<$request->quantiteStock){
+            return back()->with('errorchamps', 'Echec!!!la quantite seuil doit être plus grande que la quantité alerte');
+        }
         $request->validate([
             'nom' => 'required',
             'description' => 'required|min:4',
-            'prix' => 'required',
             'quantiteStock' => 'required',
-            'dateExpiration' => 'required',
             'quantiteSeuil' => 'required',
             'famille' => 'required',
             'forme' => 'required',
@@ -146,9 +157,7 @@ class ProduitController extends Controller
             $produit->user_id = Auth::user()->id;
             $produit->nom = $request->nom;
             $produit->description = $request->description;
-            $produit->prix = $request->prix;
             $produit->quantiteStock = $request->quantiteStock;
-            $produit->dateExpiration = $request->dateExpiration;
             $produit->quantiteSeuil = $request->quantiteSeuil;
             $produit->famille_id = $request->famille;
             $produit->forme_id = $request->forme;

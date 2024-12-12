@@ -64,13 +64,7 @@
                                      @enderror
                                   </span>
                             </div>
-                            <div class="mb-3">
-                                <label for="prix">Prix</label>
-                                <input type="prix" class="form-control"  name="prix" placeholder="Entrer prix" value="{{$produit->prix}}">
-                                <span class="text-danger">@error('prix'){{ $message }}
-                                   @enderror
-                                </span>
-                            </div>
+                            
                            <div class="mb-3">
                                 <label for="quantiteStock">Quantite en Stock</label>
                                 <input id="quantiteStock" name="quantiteStock" type="text" class="form-control" placeholder="Entrer quantite en stock" value="{{$produit->quantiteStock}}">
@@ -83,13 +77,7 @@
 
                         <div class="col-sm-6">
 
-                            <div class="mb-3" id="datepicker1">
-                                <label for="dateExpiration">Date Expiration</label>
-                                <input id="dateExpiration" name="dateExpiration" type="date" class="form-control"  value="{{$produit->dateExpiration}}">
-                                <span class="text-danger">@error('dateExpiration'){{ $message }}
-                                    @enderror
-                                 </span>
-                            </div>
+                           
 
                             <div class="mb-3">
                                 <label for="quantiteSeuil">Quantité Seuil</label>
@@ -127,7 +115,7 @@
                     
                     
                     <div class="d-flex flex-wrap gap-2">
-                        <button type="submit" class="btn btn-success waves-effect waves-light">Modifier</button>
+                        <button type="submit" class="btn btn-primary waves-effect waves-light">Modifier</button>
                         
                     </div>
                     

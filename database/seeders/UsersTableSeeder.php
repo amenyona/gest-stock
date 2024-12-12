@@ -52,7 +52,7 @@ class UsersTableSeeder extends Seeder
             'password' => Hash::make('password')
         ]);
 
-        $pharmacien = User::create([
+        $magasinier = User::create([
             'uuid' => (string)Str::uuid(),
             'user_creator_id' => 1,
             'name' => 'KABORE',
@@ -85,12 +85,12 @@ class UsersTableSeeder extends Seeder
         ]);
 
         $adminRole = Role::where('name','admin')->first();
-        $pharmacienRole = Role::where('name','Pharmacien')->first();
+        $magasinierRole = Role::where('name','magasinier')->first();
         $caissierRole = Role::where('name','Caissier')->first();
         $controlleurRole = Role::where('name','Contrôlleur')->first();
 
         $admin->roles()->attach($adminRole);
-        $pharmacien->roles()->attach($pharmacienRole);
+        $magasinier->roles()->attach($magasinierRole);
         $caissier->roles()->attach($caissierRole);
         $controlleur->roles()->attach($controlleurRole);
     }

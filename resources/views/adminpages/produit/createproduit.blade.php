@@ -1,21 +1,6 @@
 @extends('admincreate')
 @section('content')
-<div class="row">
-    <div class="col-12">
-        <div class="page-title-box d-sm-flex align-items-center justify-content-between">
-            <h4 class="mb-sm-0 font-size-18">{{$tableau['liste']}}</h4>
 
-            <div class="page-title-right">
-                <ol class="breadcrumb m-0">
-                    <li class="breadcrumb-item"><a href="javascript: void(0);">{{$tableau['table']}}</a></li>
-                    <li class="breadcrumb-item active">{{$tableau['liste']}}</li>
-                </ol>
-            </div>
-
-        </div>
-    </div>
-</div>
-<!-- end page title -->
 
 <div class="row">
     <div class="col-12">
@@ -63,32 +48,8 @@
                                      @enderror
                                   </span>
                             </div>
-                            <div class="mb-3">
-                                <label for="prix">Prix</label>
-                                <input type="prix" class="form-control"  name="prix" placeholder="Entrer prix" value="{{old('prix')}}">
-                                <span class="text-danger">@error('prix'){{ $message }}
-                                   @enderror
-                                </span>
-                            </div>
-                           <div class="mb-3">
-                                <label for="quantiteStock">Quantite en Stock</label>
-                                <input id="quantiteStock" name="quantiteStock" type="text" class="form-control" placeholder="Entrer quantite en stock" value="{{old('quantiteStock')}}">
-                                <span class="text-danger">@error('quantiteStock'){{ $message }}
-                                    @enderror
-                                 </span>
-                            </div>
-                                                    
-                        </div>
 
-                        <div class="col-sm-6">
-
-                            <div class="mb-3" id="datepicker1">
-                                <label for="dateExpiration">Date Expiration</label>
-                                <input id="dateExpiration" name="dateExpiration" class="form-control" type="date" value="{{old('quantiteStock')}}">
-                                <span class="text-danger">@error('dateExpiration'){{ $message }}
-                                    @enderror
-                                 </span>
-                            </div>
+                          
 
                             <div class="mb-3">
                                 <label for="quantiteSeuil">Quantité Seuil</label>
@@ -97,10 +58,24 @@
                                     @enderror
                                  </span>
                             </div>
+                                                    
+                        </div>
+
+                        <div class="col-sm-6">
+                            
+                            <div class="mb-3">
+                                <label for="quantiteStock">Quantite Alerte</label>
+                                <input id="quantiteStock" name="quantiteStock" type="text" class="form-control" placeholder="Entrer quantite alerte" value="{{old('quantiteStock')}}">
+                                <span class="text-danger">@error('quantiteStock'){{ $message }}
+                                    @enderror
+                                </span>
+                            </div>
+
+                           
                             
                             <div class="mb-3">
                                 <label class="control-label">Familles</label>
-                                <select class="form-control select2" name="famille"> 
+                                <select class="form-control select2 selectforme" name="famille"> 
                                     <option>Veuillez Selectionner</option>
                                     @foreach ($familles as $item)
                                     <option value="{{$item->id}}">{{$item->nom}}</option>
@@ -111,12 +86,9 @@
 
                             <div class="mb-3">
                                 <label class="control-label">Formes</label>
-                                <select class="form-control select2" name="forme"> 
+                                <select class="form-control select2 forme" name="forme" dependente="forme"> 
                                     <option>Veuillez Selectionner</option>
-                                    @foreach ($formes as $item)
-                                    <option value="{{$item->id}}">{{$item->nom}}</option>
-                                    @endforeach
-                                    
+                                                                     
                                 </select>
                             </div>
                            

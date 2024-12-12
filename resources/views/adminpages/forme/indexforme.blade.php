@@ -11,7 +11,7 @@
                   <div class="col-sm-6">
                     
                     <div class="mb-3">
-                      <a href="{{route('forme.create')}}" class="btn btn-primary waves-effect waves-light btn-sm">Cr&eacute;er famille de produits<i class="mdi mdi-arrow-right ms-1"></i></a>
+                      <a href="{{route('forme.create')}}" class="btn btn-primary waves-effect waves-light btn-sm">Cr&eacute;er la forme de produits<i class="mdi mdi-arrow-right ms-1"></i></a>
 
                     </div>
                   </div>
@@ -41,6 +41,7 @@
                 <table id="datatable" class="table table-bordered dt-responsive  nowrap w-100">
                     <thead>
                     <tr>
+                        <th>Famille</th>
                         <th>Nom</th>
                         <th>Description</th>
                         
@@ -52,6 +53,8 @@
 
                         @foreach ($formes as $item)
                             <tr>
+
+                              <td>{{implode(',',$item->famille()->get()->pluck('nom')->toArray())}}</td>
 
                                 <td>{{$item->nom}}</td>
                                 <td>{{$item->description}}</td>

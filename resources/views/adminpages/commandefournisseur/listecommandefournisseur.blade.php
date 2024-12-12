@@ -29,7 +29,7 @@
                     <a href="{{route('fournisseur.rechercherLesommandes')}}" class="btn btn-primary waves-effect waves-left btn-sm">Revenir à la recherche <i class="mdi mdi-arrow-left ms-1"></i></a>
                     <br/>  <br/>
                     <div class="alert alert-warning" role="alert">
-                        <strong style="text-transform: uppercase;font-style: italic;font-size: 2em;text-align:center;">{{$etat}} auprés DE/(D') {{retreiveFournisseur($fournisseur)}}</strong>
+                        <strong style="text-transform: uppercase;font-style: italic;font-size: 1.2em;text-align:center;"> {{$etat}} auprés DE/(D')  {{retreiveFournisseur($fournisseur)}}  pour le bon de commande {{session()->get('keynumerocommande')}}</strong> 
                     </div>
                 </div><br/>
                 <div class="results">
@@ -66,7 +66,7 @@
           
                             </div>
                             <div class="col-xl-4" style="font-style: italic;font-size: 1.5em;text-align:center;color:black;">
-                                Nous avons au total {{countCommande(session()->get('keye'),session()->get('keyf'))}} commandes en cours de livraison
+                                Nous avons au total {{countCommandef(session()->get('keye'),session()->get('keyf'),session()->get('keynumerocommande'))}} commandes en cours de livraison
                             </div>
                             <div class="col-xl-4">
                                 <a href="{{route('fournisseur.commandesencours')}}" class="btn btn-success waves-light waves-effect">Voir toute les commandes en cours</a>
@@ -78,7 +78,7 @@
                         <div class="row">
                             
                             <div class="col-xl-4" style="font-style: italic;font-size: 1.5em;text-align:center;color:black;">
-                                Nous avons au total {{countCommande(session()->get('keye'),session()->get('keyf'))}} commandes en cours de livraison
+                                Nous avons au total {{countCommandef(session()->get('keye'),session()->get('keyf'),session()->get('keynumerocommande'))}} commandes en cours de livraison
                             </div>
                             <div class="col-xl-4">
                                 <a href="{{route('fournisseur.commandeslivrees')}}" class="btn btn-success waves-light waves-effect">Voir toute les commandes livrées</a>
@@ -89,7 +89,7 @@
                         <div class="row">
                             
                             <div class="col-xl-4" style="font-style: italic;font-size: 1.5em;text-align:center;color:black;">
-                                Nous avons au total {{countCommande(session()->get('keye'),session()->get('keyf'))}} commandes en cours de livraison
+                                Nous avons au total {{countCommandef(session()->get('keye'),session()->get('keyf'),session()->get('keynumerocommande'))}} commande(s) annulée(s)
                             </div>
                             <div class="col-xl-4">
                                 <a href="#" class="btn btn-success waves-light waves-effect">Voir toute les commandes annulées</a>
@@ -137,11 +137,20 @@
                     <tr>
                     
                         <td>{{$item->produitnom}}</td>
-                        <td>{{$item->quantitefourniprod}}</td>
+                        <td>{{$item->quantitefourniprod - $item->quantiteLivraison}} </td>
                         <td>{{$item->datefourniprod}}</td>
                         
-                        <td>                       
-                            <a href="{{route('fournisseur.demarrerTraitementLivraison',$item->uuidfourniprod)}}" class="btn btn-warning waves-light waves-effect">Voir en détail</a>                           
+                        <td>  
+                            @if($etat!="Commandes annulées")                 
+                            <form style="display: inline-block;" action="#" method="post">
+                                @csrf
+                                @method('DELETE')
+                                <a href="{{route('fournisseur.retreiveInformationsFournisseurProduit',$item->uuidfourniprod)}}"  onclick="return confirm('Etes vous sûr de vouloir supprimer ce fournisseur ?')" class="btn btn-primary waves-light waves-effect">Annuler le reste de commande</a>
+                                <input name="_method" type="hidden" value="DELETE" class="far fa-trash-alt">
+                                <input type="hidden" name="_token" value="{{ csrf_token() }}">
+                             
+                          </form> 
+                          @endif                 
                         </td>
                     </tr>
                     @endForeach

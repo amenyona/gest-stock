@@ -23,6 +23,9 @@ class Famille extends Model
     public function produits(){
         return $this->hasMany('App\Models\Produit','famille_id','id');
     }
+    public function formes(){
+        return $this->hasMany('App\Models\Forme','famille_id','id');
+    }
 
     
 }

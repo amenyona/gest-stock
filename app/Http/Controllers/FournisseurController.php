@@ -7,6 +7,7 @@ use App\Models\Fournisseur;
 use App\Models\Produit;
 use App\Models\Stock;
 use App\Models\Reglement;
+use App\Models\Livraison;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
@@ -77,13 +78,9 @@ class FournisseurController extends Controller
            }catch (\Throwable $e) {
                     DB::rollback();
                     throw $e;
-                }  
-        
+                }          
         
     }
-
- 
-  
 
     /**
      * Display the specified resource.
@@ -98,7 +95,18 @@ class FournisseurController extends Controller
      */
     public function edit(Fournisseur $fournisseur)
     {
-        //
+        $tableau = [
+            'liste' => 'Modification Fournisseur',
+            'table' => 'Fournisseurs'
+            ];
+  
+        $user = User::where('id','=',Auth::user()->id)->first();
+        $url = $_SERVER['REQUEST_URI'];
+        $uuid = substr($url,18); 
+        $fournisseur = Fournisseur::where('uuid',$uuid)->first();
+        //dd($fournisseur);
+        return view('adminpages.fournisseur.editfournisseur',compact('user','fournisseur','tableau'));  
+
     }
 
     /**
@@ -106,7 +114,36 @@ class FournisseurController extends Controller
      */
     public function update(Request $request, Fournisseur $fournisseur)
     {
-        //
+        //dd($request->input());
+        $request->validate([
+            'raisonSocial' => 'required',
+            'adresse' => 'required',
+            'telephone' => 'required',
+            'email' => 'required',
+            ]);  
+             $url = $_SERVER['REQUEST_URI'];
+             $uuid = substr($url,12); 
+             //dd($uuid);
+             DB::beginTransaction();
+
+            try {
+
+        $fournisseur = Fournisseur::find($request->fournissuerId);
+        //dd($fournisseur);
+        $fournisseur->user_id = Auth::user()->id;
+        $fournisseur->raisonSocial = $request->raisonSocial;
+        $fournisseur->adresse = $request->adresse;
+        $fournisseur->telephone = $request->telephone;
+        $fournisseur->email = $request->email;
+        $query = $fournisseur->save();
+        if($query){
+            return redirect()->route('fournisseur.index')->with('success','Votre modification a été faite avec succès'); 
+        }
+                DB::commit();
+            } catch (\Throwable $th) {
+                DB::rollback();
+                throw $th;
+            }
     }
 
     /**
@@ -114,7 +151,17 @@ class FournisseurController extends Controller
      */
     public function destroy(Fournisseur $fournisseur)
     {
-        //
+        $url = $_SERVER['REQUEST_URI'];
+        $uuid = substr($url,20);
+        //dd($uuid);
+        $fournisseurinfo = Fournisseur::where('uuid', $uuid)->first();
+        $fournisseur = Fournisseur::find($fournisseurinfo['id']);
+        //dd($fournisseur);
+        $fournisseur->user_id = Auth::user()->id;
+        $fournisseur->worked = 0;;
+        $query = $fournisseur->save();
+        return redirect()->route('fournisseur.index')->with('success','Votre suppression a été faite avec succès'); 
+
     }
 
     public function indexCommande(){
@@ -142,16 +189,29 @@ class FournisseurController extends Controller
 
     }
 
+    public function generate_cs()
+    {
+        $c1 = "DONBOSCO";
+        $c2 = rand(1, 99999);
+        $c2 = str_pad($c2, 5, '0', STR_PAD_LEFT);
+        $c3 = range('a', 'z');
+        shuffle($c3);
+        $c3 = strtoupper($c3[0]);
+        $c = $c1 . $c2 . $c3;
+        return $c;
+    }
+
     public function commandeFournisseur(Request $request){
       //var_dump($request->session()->get('keyFournisseur'));
       //dd($request->input());
       $today = Carbon::now();
-      
+      $numero = $this->generate_cs();
       $produit = $request->item_produit;
       $quantite = $request->item_quantite;
       $dateExpereLivraison = $request->item_datecommande;
-      $idFournisseur = $request->session()->get('keyFournisseur');
-        
+      $idFournisseur = $request->session()->get('keyFournisseur'); 
+      $request->session()->put('datecommande', $today);       
+      $request->session()->put('numerocommande', $numero);       
         //dd($image);
         for ($i = 0; $i < count($produit); $i++) {
          $verif = DB::table('fournisseur_produit')->where([
@@ -161,15 +221,12 @@ class FournisseurController extends Controller
          ])->get()->count();
          if($verif>0){
             return redirect()->route('fournisseur.indexCommande')->with('errorchamps','Echec de tentative. Il y a des produits dans cette liste qui étaient commandés auprès de ce fournisseur et qui sont en attente de livraison. Consulter votre fiche de commande en cours et veilleuz le relancer.Merci.'); 
-
          }
             $dataSave = [
                 'fournisseur_id' => $idFournisseur,
                 'user_id' => Auth::user()->id,
                 'uuid' => (string)Str::uuid(),
                 'produit_id' => $produit[$i],
-                'reglement_id' => 1,
-                'livraison_id' => 1,
                 'dateCommande' => $today,
                 'dateExpereLivraison' => $dateExpereLivraison[$i],
                 'quantiteCommande' => $quantite[$i],
@@ -179,7 +236,23 @@ class FournisseurController extends Controller
                 'résolu' => "en_cours",
                 'created_at' => $today,
                 'updated_at' => $today,               
-                'numeroCommande' => 0,               
+                'numeroCommande' => $numero,               
+            ];
+            $res [] = [
+                'fournisseur_id' => $idFournisseur,
+                'user_id' => Auth::user()->id,
+                'uuid' => (string)Str::uuid(),
+                'produit_id' => $produit[$i],
+                'dateCommande' => $today,
+                'dateExpereLivraison' => $dateExpereLivraison[$i],
+                'quantiteCommande' => $quantite[$i],
+                'commandé' => "en_cours",
+                'worked' => 1,
+                'livré' => "pas_encore",
+                'résolu' => "en_cours",
+                'created_at' => $today,
+                'updated_at' => $today,               
+                'numeroCommande' => $numero, 
             ];
             
 
@@ -188,7 +261,13 @@ class FournisseurController extends Controller
             
 
         }
-        return redirect()->route('fournisseur.indexCommande')->with('success','Votre enregistrement a été fait avec succès'); 
+        $data = [
+            'commandes' =>$res
+        ];
+
+         $pdf = Pdf::loadView('adminpages.etats.bordereaucommandefournisseur',$data);
+        return $pdf->download('bordereaucommandefournisseur.pdf');
+        //return redirect()->route('fournisseur.indexCommande')->with('success','Votre enregistrement a été fait avec succès'); 
     }
 
     public function rechercherLesommandes(Request $request){
@@ -204,9 +283,66 @@ class FournisseurController extends Controller
            return view('adminpages.commandefournisseur.recherchercommandefournisseur',compact('fournisseurs','user','tableau')); 
     }
 
+       public function fetchNumeroCommande(Request $request){
+                $select = $request->get('select');
+                $value = $request->get('value');
+                $dependent = $request->get('dependent');
+                $query = DB::table('fournisseur_produit')
+                ->where([
+                    ['fournisseur_id','=',session()->get('fournisseurIdC')],
+                    ['commandé','=',$value]
+                ])->select('numeroCommande')
+                ->groupBy('numeroCommande')
+                ->get();
+                $output = '<option value="Veuillez Sélectionner">Sélectionner un '.$dependent.'</option>';
+                foreach($query as $row){
+                    $output .= '<option value="'.$row->numeroCommande.'">'.$row->numeroCommande.'</option>';
+                }
+                echo $output;
+                
+            }
+    public function fetchFoirnisseurId(Request $request)
+    {
+        $value = $request->get('value');
+        if (isset($value)) {
+            $request->session()->put('fournisseurIdC',$value);
+            return response()->json(['message' => ' trouvé'], 200);
+        } else {
+            return response()->json(['message' => 'Valeur manquante'], 400);
+        }
+    }
+
+    public function indexCommandesFournisseur(Request $request){
+        $tableau = [
+            'liste' => 'Liste  commandes',
+            'table' => 'Commandes'
+            ];
+
+        $user = User::where('id', '=', Auth::user()->id)->first();
+        $fournisseurs = Fournisseur::where('worked','=',1)->get();
+        $commandes = DB::table('fournisseur_produit')
+            ->join('fournisseurs','fournisseur_produit.fournisseur_id','=','fournisseurs.id')
+            ->join('produits','fournisseur_produit.produit_id','=','produits.id')
+            ->select('fournisseur_produit.user_id as idfourniproduserId',
+                     'fournisseur_produit.fournisseur_id as idfourniprodfourniId',
+                     'fournisseur_produit.produit_id as idfourniprodproId',
+                     'fournisseur_produit.uuid as uuidfourniprod',
+                     'fournisseur_produit.dateCommande as datefourniprod',
+                     'fournisseur_produit.quantiteCommande as quantitefourniprod',
+                     'fournisseur_produit.created_at as created_at',
+                     'fournisseur_produit.updated_at as updated_at',
+                     'produits.nom as produitnom',
+                     'fournisseurs.raisonSocial as raisonSocial'
+                      )
+                      ->orderBy('created_at','DESC')
+                      ->latest()->paginate('10');
+                      //$commandes = retreiveInfoFournisseurProduit($request->etat,$request->fournisseur);
+                      return view('adminpages.commandefournisseur.cosultcommandefournisseur',compact('commandes','user','tableau','fournisseurs'));
+    }
+
     public function afficherRecherches(Request $request){
         //dd($request->input());
-        if ($request->fournisseur == "Veuillez Selectionner" || $request->etat == "Veuillez Selectionner") {
+        if ($request->fournisseur == "Veuillez Sélectionner" || $request->etat == "Veuillez Sélectionner" || $request->numerocomande == "Veuillez Sélectionner" || $request->numerocomande == "Veuillez Sélectionner un numero commande") {
             return back()->with('errorchamps', 'Echec!!!Veuillez selectionner les champs fournisseur, ou état');
         }
         $tableau = [
@@ -227,18 +363,22 @@ class FournisseurController extends Controller
         $data = Fournisseur::find($fournisseur);
         $request->session()->put('keyf',$fournisseur);
         $request->session()->put('keye',$request->etat);
+        $request->session()->put('keynumerocommande',$request->numerocomande);
         $uuid = $data->uuid;
         $commandes = DB::table('fournisseur_produit')
             ->join('fournisseurs','fournisseur_produit.fournisseur_id','=','fournisseurs.id')
             ->join('produits','fournisseur_produit.produit_id','=','produits.id')
             ->where('fournisseur_produit.commandé','=',$request->etat)
             ->where('fournisseur_produit.fournisseur_id','=',$request->fournisseur)
+            ->where('fournisseur_produit.numeroCommande','=',$request->numerocomande)
             ->select('fournisseur_produit.user_id as idfourniproduserId',
                      'fournisseur_produit.fournisseur_id as idfourniprodfourniId',
                      'fournisseur_produit.produit_id as idfourniprodproId',
                      'fournisseur_produit.uuid as uuidfourniprod',
                      'fournisseur_produit.dateCommande as datefourniprod',
                      'fournisseur_produit.quantiteCommande as quantitefourniprod',
+                     'fournisseur_produit.quantiteLivraison as quantiteLivraison',
+                     'fournisseur_produit.numeroCommande as numeroCommande',
                      'fournisseur_produit.created_at as created_at',
                      'fournisseur_produit.updated_at as updated_at',
                      'produits.nom as produitnom',
@@ -259,7 +399,7 @@ class FournisseurController extends Controller
         $uuid = substr($url, 27);
         //dd($request->session()->get('keye'));
         $commande = retreiveInfo($uuid);
-        $commandeencours = retreiveInfoFournisseurProduit($request->session()->get('keye'),$request->session()->get('keyf'));
+        $commandeencours = retreiveInfoFournisseurProduit($request->session()->get('keye'),$request->session()->get('keyf'),session()->get('keynumerocommande'));
         //dd($commandeencours);
         $user = User::where('id', '=', Auth::user()->id)->first();
         return view('adminpages.commandefournisseur.fichetraitementcommande',compact('user','tableau','commande','commandeencours')); 
@@ -341,6 +481,49 @@ class FournisseurController extends Controller
                     //dd($res);
                     return back()->with('success','Votre enregistrement a été fait avec succès');                  
     }
+
+    public function fetchProduitQuantiteCommandee(Request $request)
+    {
+        $value = $request->get('value');
+        if (isset($value)) {
+            $produit = DB::table('fournisseur_produit')->where('produit_id',$value)->first();
+            if ($produit) {
+                return response()->json($produit);
+            } else {
+                return response()->json(['error' => 'Produit non trouvé'], 404);
+            }
+        } else {
+            return response()->json(['error' => 'Valeur manquante'], 400);
+        }
+    }
+
+   public function retreiveInformationsFournisseurProduit(){
+        $url = $_SERVER['REQUEST_URI'];
+        $uuid = substr($url,39);
+        //dd($uuid);
+        $today = Carbon::now();
+        /*$commandes = DB::table('fournisseur_produit')
+                   ->where('fournisseur_produit.uuid','=',$uuid)->first();
+        dd($commandes); */ 
+        DB::update('update  fournisseur_produit 
+              set 
+              updated_at = ?, 
+              commandé = ?,
+              user_id = ?,
+              livré = ?
+              where uuid = ? ', 
+              [
+                  $today,
+                  "annulé",
+                  Auth::user()->id,
+                  "livre_en_partie",
+                  $uuid
+                ]);    
+                return back()->with('success','Votre annulation du reste de  commande  a été faite avec succès');                  
+
+        
+    }
+
     public function traiterCommande(Request $request){
       //dd($request->input());
       $request->validate([
@@ -362,78 +545,122 @@ class FournisseurController extends Controller
         return back()->with('errorchamps', 'Echec!!!Veuillez selectionner le champ nature de paiement');
     }
       $today = Carbon::now();
+      $somme = 0;
+      $etatCommande ="";
+      $etatLivre ="";
+      $montantDefeinitiPaye = 0;
       $produit = $request->item_produit;
       $quantite = $request->item_quantitelivree;
+      $quantiteDefectueuses = $request->item_quantitedefectuese;
       $prix = $request->item_prixlivraison;
       $idFournisseur = $request->session()->get('keyf');
-      $image = $request->file('fichier');
-      $my_image = rand() . '.' . $image->getClientOriginalExtension();
-      $image->move($_SERVER['DOCUMENT_ROOT'] . '/upload', $my_image);
-      $reglement = new Reglement;
-      $reglement->natureReglement = $request->nature;
-      $reglement->user_id = Auth::user()->id;
-      $reglement->uuid = (string)Str::uuid(); 
-      $reglement->preuve = $my_image;
-      $reglement->montantTotal = $request->montant;
-      $query = $reglement->save();
-      $insertedId = $reglement->id; 
       $cmd = DB::table('fournisseur_produit')->where([
-        ['fournisseur_id','=',$idFournisseur],
-        ['numeroCommande','=',0]
-      ]
-        )->take(1)
-        ->get();
-      session(['cmds' => $cmd]);
-      $idEtat = $request->session()->get('keye');
-        for ($i = 0; $i < count($produit); $i++) {
-            
-                                 DB::update('update  fournisseur_produit 
-                                 set quantiteLivraison = ?,
-                                  dateLivraison = ?, 
-                                  updated_at = ?, 
-                                  prixLivraison = ?, 
-                                  commandé = ?,
-                                  numeroCommande = ?,
-                                   reglement_id = ? where produit_id = ? and numeroCommande = ?', 
-                                   [
-                                    $quantite[$i],
-                                    $today,
-                                    $today,
-                                    $prix[$i],
-                                    "livré",
-                                    1,
-                                    $insertedId,$produit[$i],0
-                                   ]);
-                                   $stok = Stock::where('produit_id','=', $produit[$i])->first();
-                                   if(empty($stok)){
-                                    //dd('ok');
-                                   
-                                    $tableau = [
-                                        'produit_id' => $produit[$i],
-                                        'quantité' => $quantite[$i],
-                                        'quantiteSeuil' => $request->quantiteSeuil,
-                                        'quantiteAlert' => $request->quantiteAlerte,
-                                        'created_at' => $today,
-                                        'updated_at' => $today
-                                    ];
-                                    DB::table('stocks')->insertGetId($tableau);
-                                   }else{
-                                    //dd('ok');               
-                                    $stk = Stock::find($stok->id);
-                                    $stk->quantité = $stk->quantité+$quantite[$i];
-                                    if($request->quantiteSeuil!=""){
-                                        $stk->quantiteSeuil = $request->quantiteSeuil;
-                                    }
-                                    if($request->quantiteAlerte!=""){
-                                        $stk->quantiteAlert = $request->quantiteAlerte;
-                                    }
-                                    $stk->updated_at = $today;
-                                    $stk->save();
-                                   }                   
-                      }                                        
+          ['fournisseur_id','=',$idFournisseur],
+          ['numeroCommande','=',session()->get('keynumerocommande')]
+          ]
+          )->take(1)
+          ->get();
+          session(['cmds' => $cmd]);
+          $idEtat = $request->session()->get('keye');
+          for ($i = 0; $i < count($produit); $i++) {
+             
+            if(retreiveQuantiteCommandeFournisseurProduit($produit[$i],$request->session()->get('keyf'),session()->get('keynumerocommande'))==$quantite[$i]){
+                $etatCommande = "livré";
+                $etatLivre = "livré";
+              }elseif(retreiveQuantiteCommandeFournisseurProduit($produit[$i],$request->session()->get('keyf'),session()->get('keynumerocommande'))!=$quantite[$i] && $quantiite[$i] >0){
+                $etatCommande = "en_cours";
+                $etatLivre = "livre_en_partie";
+              }else{
+                $etatCommande = "en_cours";
+                $etatLivre = "pas_encore";
+              }
+              
+              DB::update('update  fournisseur_produit 
+              set quantiteLivraison = ?,
+              dateLivraison = ?, 
+              updated_at = ?, 
+              prixLivraison = ?, 
+              commandé = ?,
+              quantitedefectuese = ?,
+              user_id = ?,
+              livré = ?
+              where produit_id = ? and numeroCommande = ?', 
+              [
+                  $quantite[$i],
+                  $today,
+                  $today,
+                  $prix[$i],
+                  $etatCommande,
+                  $quantiteDefectueuses[$i],
+                  Auth::user()->id,
+                  $etatLivre,
+                  $produit[$i],session()->get('keynumerocommande')
+                ]);
+                $stok = Stock::where('produit_id','=', $produit[$i])->first();
+                if(empty($stok)){
+                    //dd('ok');
+                    
+                    $tableau = [
+                        'user_id' => Auth::user()->id,
+                        'produit_id' => $produit[$i],
+                        'quantité' => $quantite[$i],
+                        /*'quantiteSeuil' => $request->quantiteSeuil,
+                        'quantiteAlert' => $request->quantiteAlerte,*/
+                        'created_at' => $today,
+                        'updated_at' => $today
+                    ];
+                    DB::table('stocks')->insertGetId($tableau);
+                }else{
+                    //dd('ok');               
+                    $stk = Stock::find($stok->id);
+                    $stk->user_id = Auth::user()->id;
+                    $stk->quantité = $stk->quantité+$quantite[$i];
+                    /*if($request->quantiteSeuil!=""){
+                        $stk->quantiteSeuil = $request->quantiteSeuil;
+                        }
+                        if($request->quantiteAlerte!=""){
+                            $stk->quantiteAlert = $request->quantiteAlerte;
+                            }*/
+                            $stk->updated_at = $today;
+                            $stk->save();
+                        }   
+                        $somme+= $quantite[$i]*$prix[$i];             
+                    }   
+                    //dd($somme);
+                    $image = $request->file('fichier');
+                    $my_image = rand() . '.' . $image->getClientOriginalExtension();
+                    $image->move($_SERVER['DOCUMENT_ROOT'] . '/upload', $my_image);
+                    $reglement = new Reglement;
+                    $reglement->natureReglement = $request->nature;
+                    $reglement->user_id = Auth::user()->id;
+                    $reglement->uuid = (string)Str::uuid(); 
+                    $reglement->preuve = $my_image;
+                    if(isset($request->remise)){
+                        
+                        $reglement->remise = $request->remise;
+                        $montantDefeinitiPaye = $somme - $somme*$request->remise;
+                    }
+                    /*if($request->livraison=="payée"){
+                        
+                        $reglement->montantLivraison = $request->montantLivraison;
+                        $montantDefeinitiPaye += $request->montantLivraison;
+                    }
+                    dd($request->montantLivraison);*/
+                    $reglement->montantTotal = $somme;
+                    $reglement->montantDefinitifPaye = $montantDefeinitiPaye;
+                    $query = $reglement->save();
+                    $insertedId = $reglement->id; 
+                    $livraison = new Livraison;
+                    $livraison->user_id = Auth::user()->id;
+                    $livraison->uuid = (string)Str::uuid(); 
+                    $livraison->reglement_id = $insertedId; 
+                    $livraison->numeroCommande = session()->get('keynumerocommande'); 
+                    $livraison->save();
+
+                    
                     //dd($res);
                     return back()->with('success','Votre enregistrement a été fait avec succès');                  
-    }
+                }
 
    
     public function getAllCommandeEncours(){
@@ -574,6 +801,7 @@ class FournisseurController extends Controller
            ->join('produits','fournisseur_produit.produit_id','=','produits.id')
            ->where('fournisseur_produit.commandé','=',session()->get('keye'))
            ->where('fournisseur_produit.fournisseur_id','=',session()->get('keyf'))
+           ->where('fournisseur_produit.numeroCommande','=',session()->get('keynumerocommande'))
            ->select('fournisseur_produit.user_id as idfourniproduserId',
                     'fournisseur_produit.fournisseur_id as idfourniprodfourniId',
                     'fournisseur_produit.produit_id as idfourniprodproId',
@@ -593,4 +821,6 @@ class FournisseurController extends Controller
         return $pdf->download('printcommandefournisseurpdf.pdf');
         
       }
+
+      
 }

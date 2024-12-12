@@ -63,16 +63,21 @@ class RequeteController extends Controller
        //dd('ok');
        $stock = Stock::limit('1')->get();
        //dd($stock[0]->quantiteAlert);
-       $seuil = $stock[0]->quantiteSeuil;
-       $tableau = [
-           'liste' => 'Liste des produits dont la quantité est inférieure à un seuil',
-           'table' => 'Stocks'
-        ];
-        $user = User::where('id', '=', Auth::user()->id)->first();
-        $stocks = Stock::where('quantité','<',$seuil)->latest()->simplePaginate(10);;
-        //dd($stocks);
-        //session(['keySeuilstocks' => $stocks]);
-        return view('adminpages.requete.seuil', compact('tableau','user','stocks'));
+       if(count($stock)>0){
+        
+           $seuil = $stock[0]->quantiteSeuil;
+           $tableau = [
+               'liste' => 'Liste des produits dont la quantité est inférieure à un seuil',
+               'table' => 'Stocks'
+            ];
+            $user = User::where('id', '=', Auth::user()->id)->first();
+            $stocks = Stock::where('quantité','<',$seuil)->latest()->simplePaginate(10);;
+            //dd($stocks);
+            //session(['keySeuilstocks' => $stocks]);
+            return view('adminpages.requete.seuil', compact('tableau','user','stocks'));
+       }else{
+        return back()->with('errorchamps', 'Echec!!!vous n\'avez pas de données disponibles');
+       }
     }
     public function imprimeSeuil(){
       $stock = Stock::limit('1')->get();

@@ -32,6 +32,14 @@ class Produit extends Model
         return $this->belongsToMany('App\Models\Fournisseur');
       }
 
+    public function clients(){
+        return $this->belongsToMany('App\Models\Client','client_produit');
+      }
+      
+    public function defautLivraisons(){
+        return $this->hasMany('App\Models\DefautLivraison','produit_id');
+      }
+
       public function forme(){
         return $this->belongsTo('App\Models\Forme','forme_id','id');
       }

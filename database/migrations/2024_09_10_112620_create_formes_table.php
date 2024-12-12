@@ -14,6 +14,7 @@ return new class extends Migration
         Schema::create('formes', function (Blueprint $table) {
             $table->id();
             $table->unsignedBigInteger('user_id');
+            $table->unsignedBigInteger('famille_id');
             $table->uuid('uuid');
             $table->string('nom');
             $table->string('description');

@@ -98,6 +98,103 @@
 <script src="{{asset('assets/js/pages/form-advanced.init.js')}}"></script>
 
 <script src="{{asset('assets/js/app.js')}}"></script>
-
 </body>
 </html>
+
+<script>
+    $(document).ready(function(){
+        $('.jkk').change(function(){
+            alert(ok)
+            if($(this).val()!=''){
+                var select = $(this).attr("id");
+                var value = $(this).val();
+                var dependent  = $('.classeecompo').attr('dependente');
+                var _token = $('input[name="_token"]').val();
+                idAnneeAcademique = value;
+                $.ajax({
+                    url : "{{route('famille.fetchFamilleForme')}}",
+                    method : "POST",
+                    data:{select:select, value:value, _token:_token,dependent:dependent},
+                    
+                    success:function(result){
+                        $('.classeecompo').html(result)
+                    }
+
+                    })
+            }
+        });
+
+        $(document).on('change', '.selectforme', function() {
+    // Code à exécuter lorsqu'une option est sélectionnée
+    var selectedValue = $(this).val();  // Récupérer la valeur sélectionnée
+    //alert(selectedValue)
+    console.log('Option sélectionnée : ' + selectedValue);
+    if(selectedValue!=''){
+                var select = $(this).attr("id");
+                var value = $(this).val();
+                var dependent  = $('.forme').attr('dependente');
+                var _token = $('input[name="_token"]').val();
+                $.ajax({
+                    url : "{{route('famille.fetchFamilleForme')}}",
+                    method : "POST",
+                    data:{select:select, value:value, _token:_token,dependent:dependent},
+                    
+                    success:function(result){
+                        //console.log(result)
+                        $('.forme').html(result)
+                    }
+
+                    })
+            }
+        });
+
+        $(document).on('change', '.fournisseurId', function() {
+    // Code à exécuter lorsqu'une option est sélectionnée
+    var selectedValue = $(this).val();  // Récupérer la valeur sélectionnée
+    //alert(selectedValue)
+    //console.log('Option sélectionnée : ' + selectedValue);
+    if(selectedValue!=''){
+                var value = $(this).val();
+                var _token = $('input[name="_token"]').val();
+                $.ajax({
+                    url : "{{route('fournisseur.fetchFoirnisseurId')}}",
+                    method : "POST",
+                    data:{ value:value, _token:_token},
+                    
+                    success:function(result){
+                        console.log(result)
+                        
+                    }
+
+                    })
+            }
+        });
+
+        $(document).on('change', '.etat', function() {
+    // Code à exécuter lorsqu'une option est sélectionnée
+    var selectedValue = $(this).val();  // Récupérer la valeur sélectionnée
+    //alert(selectedValue)
+    //console.log('Option sélectionnée : ' + selectedValue);
+    if(selectedValue!=''){
+                
+                var select = $(this).attr("id");
+                var value = $(this).val();
+                var dependent  = $('.numerocomande').attr('dependente');
+                var _token = $('input[name="_token"]').val();
+                $.ajax({
+                    url : "{{route('fournisseur.fetchNumeroCommande')}}",
+                    method : "POST",
+                    data:{select:select, value:value, _token:_token,dependent:dependent},
+                    
+                    success:function(result){
+                        //console.log(result)
+                        $('#numerocomande').html(result)
+                    }
+
+                    })
+            }
+        });
+
+
+    })
+    </script>

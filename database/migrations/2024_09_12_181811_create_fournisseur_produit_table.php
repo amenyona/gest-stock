@@ -23,11 +23,13 @@ return new class extends Migration
             $table->string('dateExpereLivraison')->nullable();
             $table->integer('quantiteCommande')->nullable();
             $table->integer('quantiteLivraison')->nullable();
+            $table->integer('quantitedefectuese')->nullable();
             $table->string('dateLivraison')->nullable();
             $table->decimal('prixLivraison',8,2)->nullable();
             $table->string('commandé')->nullable();
             $table->string('livré')->nullable();
             $table->string('résolu')->nullable();
+            $table->string('numeroCommande')->nullable();
             $table->boolean('worked')->default(false);
             $table->timestamps();
         });

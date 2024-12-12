@@ -1,4 +1,4 @@
-@extends('admin')
+@extends('admincreate')
 @section('content')
 <div class="row">
     <div class="col-12">
@@ -50,12 +50,25 @@
                         <br>
                         <div class="col-sm-6">
                             <div class="mb-3">
+                                <label for="annee_en_cours">Famille Produit</label>
+                                <select class="form-control select2" name="familles"> 
+                                    <option>Veuillez Selectionner</option>
+                                    @foreach ($familles as $item)
+                                    <option value="{{$item->id}}">{{$item->nom}}</option>
+                                    @endforeach                            
+                                </select>
+                            </div> 
+                            <div class="mb-3">
                                 <label for="nom">Nom</label>
                                 <input type="text" class="form-control"  name="nom" placeholder="Entrer le nom" value="{{old('nom')}}">
                                    <span class="text-danger">@error('nom'){{ $message }}
                                      @enderror
                                   </span>
                             </div>
+                            
+                        </div>
+                        <div class="col-sm-6">
+                            
                             <div class="mb-3">
                                 <label for="description">Description</label>
                                 <textarea name="description" id="textarea"  class="form-control" maxlength="225" rows="3"
@@ -64,7 +77,6 @@
                                      @enderror
                                   </span>
                             </div>
-                            
                         </div>
 
                         

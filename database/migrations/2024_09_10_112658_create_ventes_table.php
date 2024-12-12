@@ -16,6 +16,7 @@ return new class extends Migration
             $table->integer('user_id')->unsinged();
             $table->uuid('uuid');
             $table->string('dateVente');
+            $table->decimal('prixlivraison',12,5)->nullable();
             $table->boolean('worked')->default(false);
             $table->timestamps();
         });

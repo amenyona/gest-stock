@@ -122,7 +122,7 @@
 $(document).ready(function(){
     var count1 = 0;
     var compteur = 0; 
-    var jas= '<?php  echo countCommande(session()->get('keye'),session()->get('keyf')); ?>'
+    var jas= '<?php  echo countCommandef(session()->get('keye'),session()->get('keyf'),session()->get('keynumerocommande')); ?>'
 
 $('.dynamique').change(function(){
 
@@ -140,7 +140,7 @@ alert(dependent)
 
 // })
 
-var produitss = <?php echo json_encode(renvoiProduitfs(session()->get('keye'),session()->get('keyf'))); ?>;
+var produitss = <?php echo json_encode(renvoiProduitffs(session()->get('keye'),session()->get('keyf'),session()->get('keynumerocommande'))); ?>;
 $('.addi').click(function(){
     
 $(".buttonSav").prop('disabled', false);     
@@ -154,7 +154,9 @@ var html2 = '';
 html2 += '<tr id="'+count1+'">';
 //html2 +='<td><select class="form-control select2" data-sub_user_id="'+count1+'" name="item_produit[]" required> <?php  echo renvoiProduitfs(session()->get('keye'),session()->get('keyf')); ?> </select></td>';
 html2 += '<td><select class="form-control select2 produit" data-sub_user_id="'+count1+'" name="item_produit[]" required><option value="Veuillez Sélectionner">Veuillez Sélectionner</option>' + produitss.map(produit => '<option value="'+produit.produitid+'">'+produit.produitnom+'</option>').join('') + '</select></td>';
+html2 +='<td><input type="text"  name="item_quantitecommandee[]" class="form-control item_quantitecommandee" required readonly/></td>';
 html2 +='<td><input type="text"  name="item_quantitelivree[]" class="form-control item_quantitelivree" required/></td>';
+html2 +='<td><input type="text"  name="item_quantitedefectuese[]" class="form-control item_quantitedefectuese" required/></td>';
 html2 +='<td><input type="text"  name="item_prixlivraison[]" class="form-control item_prixlivraison" required/></td>';
 
 $('#result').append(html2); 
@@ -162,7 +164,7 @@ $('#result').append(html2);
 })
 $(document).on('click', '.pro', function(){
 var button_id = $(this).attr("id");
-$("tr#"+button_id).remoordve();
+$("tr#"+button_id).remove();
 count1--
 //alert(count)
 if(count1 <= 0){
@@ -174,20 +176,49 @@ count1=0
 $(document).on('change', '.produit', function() {
     // Code à exécuter lorsqu'une option est sélectionnée
     var selectedValue = $(this).val();  // Récupérer la valeur sélectionnée
-    console.log('Option sélectionnée : ' + selectedValue);
+    //console.log('Option sélectionnée : ' + selectedValue);
     var parentRow = $(this).closest('tr');  // Récupérer la ligne parente (<tr>)
+    var quantiteField = parentRow.find('input[name="item_quantitecommandee[]"]');  // Trouver le champ quantité
     // Attribuer une valeur à `item_prixunitairev[]` basée sur la sélection
     //quantiteField.val(selectedValue);  // Par exemple, utiliser la valeur sélectionnée (vous pouvez la changer)
     // Afficher dans la console pour vérifier
-    console.log('Quantité mise à jour avec la valeur : ' + selectedValue)
+    //console.log('Quantité mise à jour avec la valeur : ' + selectedValue)
     var selectedText = $(this).find('option:selected').text();
     $('.produit').not(this).each(function(){
         $(this).find('option[value="'+selectedValue+'"]').remove();
     })
-
-    
+    var value = selectedValue
+    $.ajax({
+    url: "{{ route('fournisseur.fetchProduitQuantiteCommandee') }}",  // L'URL de la route Laravel
+    type: "POST",  // Méthode POST pour envoyer des données
+    data: {
+        _token: "{{ csrf_token() }}",  // Ajout du token CSRF pour la protection
+        value: value  // La valeur envoyée au serveur
+    },
+    success: function(response) {
+        // Traiter la réponse du serveur
+        //console.log(response);
+        quantiteField.val(response.quantiteCommande-response.quantiteLivraison);
+        
+        // Vous pouvez mettre à jour votre interface avec les données reçues
+    },
+    error: function(xhr, status, error) {
+        // Gérer les erreurs
+        console.error('Erreur : ' + error);
+    }
+});
 });
 
+$(document).on('change', '.livraison', function() {
+    //alert($(this).val())
+    var value = $(this).val()
+    if(value==="gratuite"){
+       $('.montantLivraison').hide(); 
+    }
+    if(value==="payée"){
+        $('.montantLivraison').fadeIn();
+    }
+});
 var produits = <?php echo json_encode(renvoiProduitss()); ?>;
     $('.ajoutord').click(function(){
         $(".buttonajoutord").prop('disabled', false);     

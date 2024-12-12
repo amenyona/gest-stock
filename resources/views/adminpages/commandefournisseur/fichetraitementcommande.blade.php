@@ -23,7 +23,7 @@
             <div class="card-body">
                 <div class="mt-4">
                     <div class="alert alert-warning" role="alert">
-                        Vousss êtes en train de passer votre commande avec votre fournisseur  <strong style="text-transform: uppercase;font-style: italic;font-size: 2em;">{{retreiveFournisseur(session()->get('keyf'))}}</strong>
+                        Vousss êtes en train d'enregistrer la livraiosn de la commande numéro {{session()->get('keynumerocommande')}} auprès de votre fournisseur  <strong style="text-transform: uppercase;font-style: italic;font-size: 2em;">{{retreiveFournisseur(session()->get('keyf'))}}</strong>
                     </div>
 
                 </div>
@@ -54,7 +54,9 @@
                             <thead>
                                 <tr>
                                     <th>Produit</th>
+                                    <th>Quantité Commandée</th>
                                     <th>Quantité Livrée</th>
+                                    <th>Quantité Défectueuse</th>
                                     <th>Prix Livraison</th>
                                     <th><button type="button" name="addi" class="btn btn-success btn-xs addi"><i class="bx bx-plus"></i></button></th>
                                 </tr>
@@ -83,12 +85,16 @@
                         </div>
                             <div class="col-sm-6">
                                 <div class="mb-3">
-                                    <label for="montant">Montant</label>
-                                    <input class="form-control form-control-lg" id="montant" type="text" name="montant">
+                                    <label for="remise">Remise</label>
+                                    <input class="form-control"  placeholder="Entrer la remise" id="remise" type="text" name="remise">
                                 </div>
                                 <div class="mb-3">
-                                    <label for="quantiteAlerte">Quantité Alerte</label>
-                                    <input id="quantiteAlerte" name="quantiteAlerte" type="text" class="form-control" placeholder="Entrer la quantité alerte" value="{{old('quantiteAlerte')}}">
+                                    <label for="livraison">Livraison</label>
+                                    <select class="form-control select2 livraison" name="livraison" required> 
+                                        <option>Veuillez Selectionner</option>
+                                        <option value="gratuite">Gratuite</option>
+                                        <option value="payée">Payée</option>
+                                    </select>                                    
                                     <span class="text-danger">@error('quantiteAlerte'){{ $message }}
                                         @enderror
                                      </span>
@@ -99,19 +105,24 @@
                         </div>
                         <div class="row">
                             <div class="col-sm-6">
+                                
                                 <div class="mb-3">
-                                    <label for="quantiteSeuil">Quantité Seuil</label>
-                                    <input id="quantiteSeuil" name="quantiteSeuil" type="text" class="form-control" placeholder="Entrer la quantité Seuil" value="{{old('quantiteSeuil')}}">
-                                    <span class="text-danger">@error('quantiteSeuil'){{ $message }}
+                                    <label for="montant">Montant Total</label>
+                                    <input id="montant" name="montant" type="text" class="form-control" placeholder="Entrer le montant total" value="{{old('montant')}}">
+                                    <span class="text-danger">@error('montant'){{ $message }}
+                                        @enderror
+                                    </span>
+                                </div>
+                            </div>
+                            
+                            <div class="col-sm-6">
+                                <div class="mb-3 montantLivraison">
+                                    <label for="montantLivraison">Montant Livraison</label>
+                                    <input id="montantLivraison" name="montantLivraison" type="text" class="form-control montantLivre" placeholder="Entrer montant Livraison" value="{{old('quantiteSeuil')}}">
+                                    <span class="text-danger">@error('montantLivraison'){{ $message }}
                                         @enderror
                                      </span>
-                                </div>
-    
-                               
-                        </div>
-                            <div class="col-sm-6">
-                                
-    
+                                </div>                                
                                                           
                         </div>
                         </div>

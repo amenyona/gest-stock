@@ -28,8 +28,8 @@ class RolesTableSeeder extends Seeder
 
         Role::create([
             'uuid' => (string)Str::uuid(),
-            'name' => 'Pharmacien',
-            'description' => 'compte pharmacien'
+            'name' => 'magasinier',
+            'description' => 'compte magasinier'
         ]);
 
         Role::create([

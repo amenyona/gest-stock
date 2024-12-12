@@ -142,9 +142,15 @@ class User extends Authenticatable
      public function ordonnances(){
         return $this->hasMany('App\Models\Ordonnance','user_id','id');
      }
+     public function commandeClients(){
+        return $this->hasMany('App\Models\CommandeClient','user_id','id');
+     }
 
      public function patients(){
         return $this->hasMany('App\Models\Patient','user_id','id');
+     }
+     public function clients(){
+        return $this->hasMany('App\Models\Client','user_id','id');
      }
 
      public function produits(){

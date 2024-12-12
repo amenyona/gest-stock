@@ -12,7 +12,7 @@
                   <div class="col-sm-6">
                     
                     <div class="mb-3">
-                      <a href="{{route('famille.create')}}" class="btn btn-primary waves-effect waves-light btn-sm">Cr&eacute;er famille de produits<i class="mdi mdi-arrow-right ms-1"></i></a>
+                      <a href="{{route('famille.create')}}" class="btn btn-primary waves-effect waves-light btn-sm">Cr&eacute;er la famille de produits<i class="mdi mdi-arrow-right ms-1"></i></a>
 
                     </div>
                   </div>
@@ -62,7 +62,7 @@
                                     <form style="display: inline-block;" action="#" method="post">
                                         @csrf
                                         @method('DELETE')
-                                        <a href="{{route('famille.destroy',$item->uuid)}}"  onclick="return confirm('Etes vous s&ucirc;r de supprimer cette famille de médicaments ?')" class="btn btn-danger waves-light waves-effect"><i class="far fa-trash-alt"></i></a>
+                                        <a href="{{route('famille.destroy',$item->uuid)}}"  onclick="return confirm('Etes vous s&ucirc;r de supprimer cette famille de produits ?')" class="btn btn-danger waves-light waves-effect"><i class="far fa-trash-alt"></i></a>
                                         <input name="_method" type="hidden" value="DELETE" class="far fa-trash-alt">
                                         <input type="hidden" name="_token" value="{{ csrf_token() }}">                      
                                   </form>

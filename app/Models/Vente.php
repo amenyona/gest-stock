@@ -13,6 +13,7 @@ class Vente extends Model
         'user_id',
         'uuid',
         'dateVente',
+        'prixlivraison',
         'worked'
     ];
 

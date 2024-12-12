@@ -155,4 +155,17 @@ class FamilleController extends Controller
         return $pdf->download('imprimeetatfamillespdf.pdf');
         
       }
+
+      public function fetchFamilleForme(Request $request){
+        $select = $request->get('select');
+        $value = $request->get('value');
+        $dependent = $request->get('dependent');
+        $query = Famille::find($value)->formes()->get();;
+        $output = '<option value="">Sélectionner une '.$dependent.'</option>';
+        foreach($query as $row){
+            $output .= '<option value="'.$row->id.'">'.$row->nom.'</option>';
+        }
+        echo $output;
+        
+    }
 }
